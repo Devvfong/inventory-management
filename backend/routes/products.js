@@ -1,1 +1,85 @@
-// REST API routes for Products\nconst express = require('express');\nconst router = express.Router();\nconst supabase = require('../utils/supabaseClient');\n\n// GET all products\nrouter.get('/', async (req, res) => {\n    const { data, error } = await supabase\n        .from('products')\n        .select('*');\n    \n    if (error) return res.status(500).json({ error: error.message });\n    res.json(data);\n});\n\n// POST a new product\nrouter.post('/', async (req, res) => {\n    const { name, sku, quantity, price, supplier_id } = req.body;\n    const { data, error } = await supabase\n        .from('products')\n        .insert([{ name, sku, quantity, price, supplier_id }])\n        .select();\n\n    if (error) return res.status(500).json({ error: error.message });\n    res.status(201).json(data[0]);\n});\n\n// PUT update product by ID\nrouter.put('/:id', async (req, res) => {\n    const { id } = req.params;\n    const { name, sku, quantity, price, supplier_id } = req.body;\n    const { data, error } = await supabase\n        .from('products')\n        .update({ name, sku, quantity, price, supplier_id })\n        .eq('id', id)\n        .select();\n\n    if (error) return res.status(500).json({ error: error.message });\n    if (!data || data.length === 0) return res.status(404).json({ error: 'Product not found' });\n    res.json(data[0]);\n});\n\n// DELETE product by ID\nrouter.delete('/:id', async (req, res) => {\n    const { id } = req.params;\n    const { data, error } = await supabase\n        .from('products')\n        .delete()\n        .eq('id', id)\n        .select();\n\n    if (error) return res.status(500).json({ error: error.message });\n    if (!data || data.length === 0) return res.status(404).json({ error: 'Product not found' });\n    res.json({ message: 'Product deleted successfully' });\n});\n\nmodule.exports = router;
+// REST API routes for Products
+const express = require('express');
+const router = express.Router();
+const supabase = require('../utils/supabaseClient');
+
+// GET all products
+router.get('/', async (req, res) => {
+    try {
+        const { data, error } = await supabase
+            .from('products')
+            .select('*');
+        
+        if (error) return res.status(500).json({ error: error.message });
+        res.json(data);
+    } catch (error) {
+        console.error('Get products error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// POST a new product
+router.post('/', async (req, res) => {
+    try {
+        const { name, sku, quantity, price, supplier_id } = req.body;
+        
+        // Add created_by field if user is authenticated
+        const productData = { name, sku, quantity, price, supplier_id };
+        if (req.user) {
+            productData.created_by = req.user.id;
+        }
+
+        const { data, error } = await supabase
+            .from('products')
+            .insert([productData])
+            .select();
+
+        if (error) return res.status(500).json({ error: error.message });
+        res.status(201).json(data[0]);
+    } catch (error) {
+        console.error('Create product error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// PUT update product by ID
+router.put('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, sku, quantity, price, supplier_id } = req.body;
+        
+        const { data, error } = await supabase
+            .from('products')
+            .update({ name, sku, quantity, price, supplier_id })
+            .eq('id', id)
+            .select();
+
+        if (error) return res.status(500).json({ error: error.message });
+        if (!data || data.length === 0) return res.status(404).json({ error: 'Product not found' });
+        res.json(data[0]);
+    } catch (error) {
+        console.error('Update product error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// DELETE product by ID
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { data, error } = await supabase
+            .from('products')
+            .delete()
+            .eq('id', id)
+            .select();
+
+        if (error) return res.status(500).json({ error: error.message });
+        if (!data || data.length === 0) return res.status(404).json({ error: 'Product not found' });
+        res.json({ message: 'Product deleted successfully' });
+    } catch (error) {
+        console.error('Delete product error:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+module.exports = router;
