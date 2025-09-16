@@ -1,0 +1,43 @@
+{
+  "name": "inventory-management-monorepo",
+  "version": "1.0.0",
+  "description": "Full-stack inventory management system monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "cd backend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "db:setup": "cd backend && npx prisma generate && npx prisma db push && npx prisma db seed",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down",
+    "docker:clean": "docker-compose down -v --rmi all"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Devvfong/inventory-management.git"
+  },
+  "keywords": [
+    "inventory",
+    "management",
+    "react",
+    "nodejs",
+    "express",
+    "prisma",
+    "postgresql",
+    "monorepo"
+  ],
+  "author": "Devvfong",
+  "license": "MIT"
+}

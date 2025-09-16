@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
+import AdminPanel from './pages/AdminPanel';
 
 const AppRoutes = () => {
   const { user, loading } = useAuth();
@@ -38,6 +39,15 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Products />
+          </ProtectedRoute>
+        }
+      />
+      
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="ADMIN">
+            <AdminPanel />
           </ProtectedRoute>
         }
       />
