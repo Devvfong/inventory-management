@@ -1,1 +1,54 @@
-// Node.js + Express backend for Inventory Management System\nrequire('dotenv').config();\nconst express = require('express');\nconst cors = require('cors');\n\n// Import API routes\nconst productRoutes = require('./routes/products');\nconst supplierRoutes = require('./routes/suppliers');\nconst transactionRoutes = require('./routes/transactions');\n\nconst app = express();\n\n// Include middleware: CORS, JSON parser\napp.use(cors());\napp.use(express.json());\n\n// Register API routes for products, suppliers, and transactions\napp.use('/api/products', productRoutes);\napp.use('/api/suppliers', supplierRoutes);\napp.use('/api/transactions', transactionRoutes);\n\n// A simple root route to check if the server is running\napp.get('/', (req, res) => {\n    res.send('Inventory Management System backend is alive!');\n});\n\n// Listen on environment port or 5000\nconst PORT = process.env.PORT || 5000;\napp.listen(PORT, () => {\n  console.log(`Server is listening on port ${PORT}`);\n});
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+
+// Import API routes
+import authRoutes from './routes/auth.js';
+import productRoutes from './routes/products.js';
+import supplierRoutes from './routes/suppliers.js';
+import purchaseOrderRoutes from './routes/purchaseOrders.js';
+
+const app = express();
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  credentials: true,
+};
+
+// Middleware
+app.use(cors(corsOptions));
+app.use(express.json());
+
+// API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/suppliers', supplierRoutes);
+app.use('/api/purchase-orders', purchaseOrderRoutes);
+
+// Health check route
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'Inventory Management System API is running!',
+    version: '1.0.0',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(500).json({ error: 'Something went wrong!' });
+});
+
+// 404 handler
+app.use('*', (req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`📚 API documentation available at http://localhost:${PORT}`);
+});
