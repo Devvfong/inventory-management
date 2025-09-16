@@ -1,1 +1,14 @@
-// Initialize Supabase client using environment variables SUPABASE_URL and SUPABASE_KEY\nconst { createClient } = require('@supabase/supabase-js');\n\nconst supabaseUrl = process.env.SUPABASE_URL;\nconst supabaseKey = process.env.SUPABASE_KEY;\n\nif (!supabaseUrl || !supabaseKey) {\n    throw new Error("Supabase URL and Key must be provided in .env file");\n}\n\nconst supabase = createClient(supabaseUrl, supabaseKey);\n\n// Export supabase object for use in routes\nmodule.exports = supabase;
+// Initialize Supabase client using environment variables SUPABASE_URL and SUPABASE_KEY
+const { createClient } = require('@supabase/supabase-js');
+
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+    throw new Error("Supabase URL and Key must be provided in .env file");
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// Export supabase object for use in routes
+module.exports = supabase;

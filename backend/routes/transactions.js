@@ -1,1 +1,36 @@
-// REST API routes for Inventory Transactions\nconst express = require('express');\nconst router = express.Router();\nconst supabase = require('../utils/supabaseClient');\n\n// GET all transactions\nrouter.get('/', async (req, res) => {\n    // Example of joining with products table to get product name\n    const { data, error } = await supabase\n        .from('transactions')\n        .select(`\n            *,\n            products ( name )\n        `);\n\n    if (error) return res.status(500).json({ error: error.message });\n    res.json(data);\n});\n\n// POST a new transaction (stock in/out)\nrouter.post('/', async (req, res) => {\n    const { product_id, type, quantity, note } = req.body;\n\n    // TODO: Add logic to update the product's quantity in the 'products' table\n    // This should be done in a database transaction to ensure data integrity.\n\n    const { data, error } = await supabase\n        .from('transactions')\n        .insert([{ product_id, type, quantity, note }])\n        .select();\n\n    if (error) return res.status(500).json({ error: error.message });\n    res.status(201).json(data[0]);\n});\n\nmodule.exports = router;
+// REST API routes for Inventory Transactions
+const express = require('express');
+const router = express.Router();
+const supabase = require('../utils/supabaseClient');
+
+// GET all transactions
+router.get('/', async (req, res) => {
+    // Example of joining with products table to get product name
+    const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+            *,
+            products ( name )
+        `);
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.json(data);
+});
+
+// POST a new transaction (stock in/out)
+router.post('/', async (req, res) => {
+    const { product_id, type, quantity, note } = req.body;
+
+    // TODO: Add logic to update the product's quantity in the 'products' table
+    // This should be done in a database transaction to ensure data integrity.
+
+    const { data, error } = await supabase
+        .from('transactions')
+        .insert([{ product_id, type, quantity, note }])
+        .select();
+
+    if (error) return res.status(500).json({ error: error.message });
+    res.status(201).json(data[0]);
+});
+
+module.exports = router;
